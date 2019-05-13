@@ -40,11 +40,11 @@ cc.Class({
             type: cc.Node
         },
 
-        // 引用 Wheel Node
-        // WheelNode: {
-        //     default: null,
-        //     type: cc.Node
-        // },
+        // 引用 Roller Node
+        rollerNode: {
+            default: null,
+            type: cc.Node
+        },
 
     },
 
@@ -77,6 +77,8 @@ cc.Class({
         this.score += 100;
 
         this.onUpdateScore();
+
+        this.rollerNode.getComponent('Roller').executeRoller();
     },
 
     onUpdateScore: function()

@@ -40,13 +40,19 @@ cc.Class({
 
     onLoad () {
 
-        this.arrSymbol = new Array(3);
+        this.arrSymbol = new Array(5);
 
         this.arrSymbolIdx = 0;
+
+        this.timer = 0;
+
+        this.rollerDuration = 3;
+
+        this.startRoller = false;
         
         // 建立 Symbol
-        for (let index = 0; index < 3; index++) {
-            this.CreateNewSymbol();
+        for (let index = 0; index < 5; index++) {
+            this.createNewSymbol(index);
         }
 
     },
@@ -55,35 +61,69 @@ cc.Class({
 
     },
 
-    // update (dt) {},
+    update (dt) {
+
+        if (this.startRoller) {
+        
+            if (this.timer > this.rollerDuration) {
+                
+                this.startRoller = false;
+
+                this.timer = 0;
+            }
+            else {
+                this.timer += dt;
+
+                this.executeRoller()
+            }
+
+        }
+
+    },
 
     // 新增Symbol
-    CreateNewSymbol: function () {
+    createNewSymbol: function (arrIndex) {
 
-        console.log('Roller::CreateNewSymbol');
-        
         let newSymbol = cc.instantiate(this.symbolPrefab);
         
         // 將新建的Symbol加入至Roller節點
         this.node.addChild(newSymbol);
 
-        console.log('Roller::CreateNewSymbol::Width='+this.node.width);
+        newSymbol.x = this.node.x;
+        newSymbol.y = (this.node.y + this.node.height/2 + 140 - 80) - 140 * arrIndex;
 
-        let posX = this.node.x;
-        let posY = (this.node.y + this.node.height/2 - 80) - 140 * this.arrSymbolIdx;
+        let symbolIdx = Math.floor(Math.random()*5);
 
-        newSymbol.setPosition(cc.v2(posX,posY));
-
-        newSymbol.getComponent('Symbol').showSymbol(4);
+        newSymbol.getComponent('Symbol').showSymbol(symbolIdx);
         
-        this.arrSymbol[this.arrSymbolIdx] = newSymbol;
-
-        this.arrSymbolIdx++;
+        this.arrSymbol[arrIndex] = newSymbol;
     },
 
     // 滾動
-    StartRoller: function () {
+    executeRoller: function () {
 
+        this.startRoller = true;
+        
+        for (let index = 0; index < this.arrSymbol.length; index++) {
+            
+            this.arrSymbol[index].y -= 10;
+
+            // 超過邊界
+            if (this.arrSymbol[3].y <= this.node.y + this.node.height/2) {
+                
+                console.log('超過邊界');
+
+                for (let snIdx = 5-1; snIdx > 0; snIdx--) {
+                    this.arrSymbol[snIdx] = this.arrSymbol[snIdx-1];
+                }
+
+                this.createNewSymbol(0);
+
+                this.timer = 5;
+
+            }
+            
+        }
 
     },
 
