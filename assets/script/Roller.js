@@ -28,9 +28,16 @@ cc.Class({
         //     }
         // },
 
+        // 引用 Symbol Prefab
         symbolPrefab :{
             default: null,
             type: cc.Prefab
+        },
+
+        // 引用 分數Node
+        scoreNode: {
+            default: null,
+            type: cc.Node
         },
 
 
@@ -65,11 +72,24 @@ cc.Class({
 
         if (this.startRoller) {
         
-            if (this.timer > this.rollerDuration) {
+            if (this.timer >= this.rollerDuration) {
                 
                 this.startRoller = false;
 
                 this.timer = 0;
+
+                // 校正Symbol位置
+                this.correctedSymbolPosition();
+
+                // 顯示動畫
+                for (let index = 0; index < this.arrSymbol.length; index++) {
+                    this.showAnimate(index);
+                    
+                }
+                
+
+                // 更新分數
+                this.updateScore();
             }
             else {
                 this.timer += dt;
@@ -94,7 +114,12 @@ cc.Class({
 
         let symbolIdx = Math.floor(Math.random()*5);
 
-        newSymbol.getComponent('Symbol').showSymbol(symbolIdx);
+        // 設定Symbol
+        newSymbol.getComponent('Symbol_prefab').setSymbol(symbolIdx);
+
+        if (0 < arrIndex && arrIndex < 4) {
+            newSymbol.getComponent('Symbol_prefab').showSymbol();
+        }
         
         this.arrSymbol[arrIndex] = newSymbol;
     },
@@ -106,26 +131,59 @@ cc.Class({
         
         for (let index = 0; index < this.arrSymbol.length; index++) {
             
-            this.arrSymbol[index].y -= 10;
+            this.arrSymbol[index].y -= 20;
+           
+        }
 
-            // 超過邊界
-            if (this.arrSymbol[3].y <= this.node.y + this.node.height/2) {
-                
-                console.log('超過邊界');
-
-                for (let snIdx = 5-1; snIdx > 0; snIdx--) {
-                    this.arrSymbol[snIdx] = this.arrSymbol[snIdx-1];
-                }
-
-                this.createNewSymbol(0);
-
-                this.timer = 5;
-
-            }
+        // 超過邊界
+        let limit = this.node.y - this.node.height/2 +20;
+        if (this.arrSymbol[3].y <= limit) {
             
+            // 移除最後一個Symbol
+            this.arrSymbol[4].destroy();
+            
+            // 更新Array
+            for (let snIdx = 5-1; snIdx > 0; snIdx--) {
+                this.arrSymbol[snIdx] = this.arrSymbol[snIdx-1];
+            
+                if (snIdx == 4) {
+                    this.arrSymbol[snIdx].getComponent('Symbol_prefab').hideSymbol();
+                }
+                else {
+                    this.arrSymbol[snIdx].getComponent('Symbol_prefab').showSymbol();
+                }
+            }
+
+            // 新增第一個Symbol
+            this.createNewSymbol(0);
+
+            // 校正Symbol位置
+            this.correctedSymbolPosition();
+
         }
 
     },
+
+    // 校正Symbol位置
+    correctedSymbolPosition: function () {
+        
+        for (let snIdx = 0; snIdx < 5; snIdx++) {
+            this.arrSymbol[snIdx].y = (this.node.y + this.node.height/2 + 140 - 80) - 140 * snIdx;
+        }
+
+    },
+
+    // 顯示動畫
+    showAnimate : function (symbolIdx) {
+        this.arrSymbol[symbolIdx].getComponent('Symbol_prefab').playAnimate();
+    },
+
+    // 更新 Score
+    updateScore: function()
+    {
+        this.scoreNode.getComponent('Score').addScore(100);
+    }
+    
 
 
 });

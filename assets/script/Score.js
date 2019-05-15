@@ -27,47 +27,14 @@ cc.Class({
         //         this._bar = value;
         //     }
         // },
-
-        symbol_A_Node: {
-            default: null,
-            type: cc.Node
-        },
-
-        symbol_K_Node: {
-            default: null,
-            type: cc.Node
-        },
-
-        symbol_Q_Node: {
-            default: null,
-            type: cc.Node
-        },
-
-        symbol_J_Node: {
-            default: null,
-            type: cc.Node
-        },
-
-        symbol_S3_Node: {
-            default: null,
-            type: cc.Node
-        },
-
-
-
     },
 
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        
-        this.arrSymbol = new Array(5);
-        this.arrSymbol[0] = this.symbol_A_Node;
-        this.arrSymbol[1] = this.symbol_K_Node;
-        this.arrSymbol[2] = this.symbol_Q_Node;
-        this.arrSymbol[3] = this.symbol_J_Node;
-        this.arrSymbol[4] = this.symbol_S3_Node;
+        this.score = 0;
 
+        this.addScore(0);
     },
 
     start () {
@@ -76,17 +43,12 @@ cc.Class({
 
     // update (dt) {},
 
-    // 顯示Symbol
-    showSymbol: function (symbolIdx) {
+    addScore: function (ScoreNum){
+        this.score += ScoreNum;
 
-        for (let index = 0; index < this.arrSymbol.length; index++) {
-            
-            if (symbolIdx != index) {
-                this.arrSymbol[index].opacity = 0;
-            }
-        }
+        let scoreLabel = this.getComponent(cc.Label);
 
+        scoreLabel.string = this.score.toString();
     },
-
 
 });

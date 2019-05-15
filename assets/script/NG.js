@@ -28,12 +28,6 @@ cc.Class({
         //     }
         // },
 
-        // 引用 分數Label
-        scoreLabel: {
-            default: null,
-            type: cc.Label
-        },
-
         // 引用 Spin Button Node
         spinButtonNode: {
             default: null,
@@ -51,18 +45,12 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
-        this.score = 0;
-        
-        this.onUpdateScore();
-
         this.spinButtonNode.on('mousedown', this.onSpin, this);
     },
 
     onDestroy () {
         this.spinButtonNode.off('mousedown', this.onSpin, this);
     },
-
-
 
     start () {
 
@@ -74,17 +62,7 @@ cc.Class({
 
         console.log('onSpain');
 
-        this.score += 100;
-
-        this.onUpdateScore();
-
         this.rollerNode.getComponent('Roller').executeRoller();
     },
-
-    onUpdateScore: function()
-    {
-        this.scoreLabel.string = this.score.toString();
-    }
-
 
 });
