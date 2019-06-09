@@ -28,41 +28,63 @@ cc.Class({
         //     }
         // },
 
-        // 引用 Spin Button Node
-        spinButtonNode: {
+        loginButton: {
             default: null,
-            type: cc.Node
+            type: cc.Node,
         },
 
-        // 引用 Roller Node
-        rollerNode: {
+        nameLabel: {
             default: null,
-            type: cc.Node
+            type: cc.Label,
         },
 
     },
 
     // LIFE-CYCLE CALLBACKS:
 
-    onLoad () {
-        this.spinButtonNode.on('mousedown', this.onSpin, this);
+    onLoad() {
+        this.loginButton.on('mousedown', this.onLogin, this);
     },
 
-    onDestroy () {
-        this.spinButtonNode.off('mousedown', this.onSpin, this);
+    start() {
+
     },
 
-    start () {
-
+    onDestroy() {
+        this.loginButton.off('mousedown', this.onLogin, this);
     },
 
     // update (dt) {},
 
-    onSpin: function () {
+    onLogin() {
+        this.node = cc.director.getScene().getChildByName('command');
+        this.s = this.node.getComponent('Command').getSocket();
 
-        console.log('onSpain');
+        const name = this.nameLabel.string;
+        console.log(`name: ${name}`);
 
-        this.rollerNode.getComponent('Roller').executeRoller();
+        // 登入封包
+        const login = JSON.stringify({
+            action: 'Login',
+            account: name,
+        });
+
+        // 平台封包
+        const platformPacket = JSON.stringify({
+            type: 'platform',
+            data: login,
+        });
+
+        this.s.sendMessage(platformPacket, (str) => {
+            console.log(str);
+            const data = JSON.parse(str);
+            if (data.result === 'true') {
+                this.node.getComponent('Command').setPlayerInfo(data.account, data.point);
+
+                cc.director.loadScene('NG');
+            }
+        });
     },
+
 
 });
